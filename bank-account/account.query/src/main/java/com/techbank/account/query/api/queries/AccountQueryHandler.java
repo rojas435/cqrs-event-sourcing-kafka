@@ -36,20 +36,24 @@ public class AccountQueryHandler implements QueryHandler {
 
     @Override
     public List<BaseEntity> handle(FindAccountByHolderQuery query) {
-        var bankAccount = accountRepository.findByAccountHolder(query.getAccountHolder());
-        if (bankAccount.isEmpty()) {
+        var bankAccounts = accountRepository.findByAccountHolder(query.getAccountHolder());
+        if (bankAccounts == null || bankAccounts.size() == 0) {
             return null;
         }
         List<BaseEntity> bankAccountList = new ArrayList<>();
-        bankAccountList.add(bankAccount.get());
+        bankAccountList.addAll(bankAccounts);
         return bankAccountList;
     }
 
     @Override
     public List<BaseEntity> handle(FindAccountWithBalanceQuery query) {
-        List<BaseEntity> bankAccountsList = query.getEqualityType() == EqualityType.GREATER_THAN
+        List<com.techbank.account.query.domain.BankAccount> bankAccounts = query.getEqualityType() == EqualityType.GREATER_THAN
                 ? accountRepository.findByBalanceGreaterThan(query.getBalance())
                 : accountRepository.findByBalanceLessThan(query.getBalance());
+        List<BaseEntity> bankAccountsList = new ArrayList<>();
+        if (bankAccounts != null && bankAccounts.size() > 0) {
+            bankAccountsList.addAll(bankAccounts);
+        }
         return bankAccountsList;
     }
 }

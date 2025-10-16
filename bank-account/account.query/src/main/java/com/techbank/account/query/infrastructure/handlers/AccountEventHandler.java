@@ -46,6 +46,8 @@ public class AccountEventHandler implements EventHandler {
         }
         var currentBalance = bankAccount.get().getBalance();
         var latestBalance = currentBalance - event.getAmount();
+        // update the balance before saving so the read model reflects the withdrawal
+        bankAccount.get().setBalance(latestBalance);
         accountRepository.save(bankAccount.get());
     }
 
