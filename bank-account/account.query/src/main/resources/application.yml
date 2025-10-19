@@ -1,23 +1,9 @@
-server:
-  port: 5001
-
 spring:
-  jpa:
-#     MySQL jpa settings
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-  datasource:
-    #MySQL datasource settings
-      url: jdbc:mysql://localhost:3306/bankAccount?createDatabaseIfNotExist=true
-      username: root
-      password: techbankRootPsw
   kafka:
+    bootstrap-servers: localhost:29092
     listener:
       ack-mode: MANUAL_IMMEDIATE
     consumer:
-      bootstrap-servers: localhost:29092
       group-id: bankaccConsumer
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -27,3 +13,20 @@ spring:
           json:
             trusted:
               packages: '*'
+  jpa:
+    # MySQL jpa settings
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    # MySQL datasource settings
+    url: jdbc:mysql://localhost:3306/bankAccount?createDatabaseIfNotExist=true
+    username: root
+    password: techbankRootPsw
+
+kafka:
+  topic: account-events
+
+server:
+  port: 5001

@@ -21,6 +21,9 @@ public class AccountEventStore implements EventStore {
     private EventProducer eventProducer;
 
     @Autowired
+    private org.springframework.kafka.core.KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Autowired
     private EventStoreRepository eventStoreRepository;
 
     @Override
@@ -43,7 +46,11 @@ public class AccountEventStore implements EventStore {
                    .build();
            var persistedEvent = eventStoreRepository.save(eventModel);
            if (!persistedEvent.getId().isEmpty()) {
-               eventProducer.produce(event.getClass().getSimpleName(), event);
+               // produce to single topic using aggregateId as key and add header with event type
+               var topic = "account-events";
+               org.apache.kafka.clients.producer.ProducerRecord<String, Object> record = new org.apache.kafka.clients.producer.ProducerRecord<>(topic, aggregateId, event);
+               record.headers().add("eventType", event.getClass().getSimpleName().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+               kafkaTemplate.send(record);
            }
         }
     }
